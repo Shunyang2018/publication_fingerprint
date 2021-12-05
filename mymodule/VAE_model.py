@@ -104,7 +104,7 @@ class MolDecoder(nn.Module):
 class Flatten(nn.Module):
 
     def forward(self, x):
-        size = x.size() 
+        size = x.size()
         return x.view(size[0], -1)
 
 
@@ -201,7 +201,7 @@ def initialize_weights(m):
                 if len(weight.size()) > 1:
                     init.xavier_uniform_(weight.data)
 
-                    
+
 class ProcessSMILES(object):
     '''
     can take either SMILES files on disk or loaded. Do not mix types. Must have drop_duplicates() method and type: pd.Seres()
@@ -225,13 +225,13 @@ class ProcessSMILES(object):
         else:
             self.chembl=smiles_chembl
             self.dc=smiles_dc
-        
+
         # if both SMILES sets are given append them and drop druplicates()
         if all([(self.chembl is not None),(self.dc is not None)]):
             self.smiles=self.chembl.append(self.dc, ignore_index=True).drop_duplicates()
             self.max_len_smiles=self._calculate_longest()
             self.charset=self.create_charset(self.smiles) # also sets self.size_of_encoding
-        
+
         # when only one of files is present, drop_dups()
         elif all([ (self.chembl is not None), (self.dc is None) ]):
             self.smiles=self.chembl.drop_duplicates()
@@ -248,12 +248,12 @@ class ProcessSMILES(object):
             self.size_of_encoding = None
         if self.smiles is not None:
             print(f'{len(self.smiles)} unique SMILES read in {round((t() - start), 4)} seconds')
-        
+
     def _calculate_longest(self):
         max_len_smiles = max(self.smiles.map(len))
         return max_len_smiles
-            
-        
+
+
     def one_hot_encode(self, STRING, charset=None, size_of_encoding=None, max_len_smiles=None, dtype=None):
         '''
         STRING - single SMILES string
@@ -262,7 +262,7 @@ class ProcessSMILES(object):
         max_len_smiles is well maxlen smiles
         DOES NOT SET CLASS VARS
         '''
-        if isinstance(STRING,str):     
+        if isinstance(STRING,str):
             if dtype is None:
                 dtype=np.uint8
             if charset is None:
@@ -286,7 +286,7 @@ class ProcessSMILES(object):
                     max_len_smiles=self.max_len_smiles
                 else:
                     max_len_smiles=len(STRING)
-            
+
 
             return np.eye(size_of_encoding, dtype=dtype)[np.array([charset.index(x) for x in STRING.ljust(max_len_smiles)]).reshape(-1)]
         else:
@@ -303,9 +303,9 @@ class ProcessSMILES(object):
                 charset = self.charset
                 if self.size_of_encoding is None:
                     size_of_encoding = len(charset)
-                else: 
+                else:
                     size_of_encoding=self.size_of_encoding
-                    
+
                 if self.max_len_smiles is None:
                     max_len_smiles = max(SMILES_series.map(len))
                 else:
@@ -314,36 +314,36 @@ class ProcessSMILES(object):
                 charset = self.create_charset(smiles=SMILES_series)
                 size_of_encoding=self.size_of_encoding
                 max_len_smiles = self.max_len_smiles
-        
+
         size_of_encoding=kwargs.get('size_of_encoding') # try if provided
-        if size_of_encoding is None: 
+        if size_of_encoding is None:
             size_of_encoding=self.size_of_encoding # try if Object has it
             if size_of_encoding is None:
                 size_of_encoding=len(charset)
                 self.size_of_encoding=size_of_encoding # if reached, also set self.property
-        
+
         max_len_smiles=kwargs.get('max_len_smiles')
-        if max_len_smiles is None: 
+        if max_len_smiles is None:
             max_len_smiles=self.max_len_smiles # try if Object has it
             if max_len_smiles is None:
                 self.max_len_smiles=max(SMILES_series.map(len))
                 max_len_smiles=self.max_len_smiles # if reached, also set self.property
-        
+
         dtype=kwargs.get('dtype')
-        if dtype is None: 
+        if dtype is None:
             dtype=np.uint8
-                
-        df = SMILES_series.apply(self.one_hot_encode, 
-                                 charset=charset, 
-                                 size_of_encoding=size_of_encoding, 
+
+        df = SMILES_series.apply(self.one_hot_encode,
+                                 charset=charset,
+                                 size_of_encoding=size_of_encoding,
                                  max_len_smiles=max_len_smiles,
                                  dtype=dtype)
-        
+
         num_encoded=df.shape[0]
         stacked = np.stack(df.values)
         del df
         print(f'one-hot-encoded {num_encoded} SMILES in {round((t() - start),4)} seconds')
-        
+
         return stacked
         #return df
 
@@ -376,7 +376,7 @@ def untransform(z, charset):
                 oh = np.argmax(z_sub[i][j])
                 s += charset[oh]
             z1.append(s.strip())
-        return z1 
+        return z1
     elif isinstance(z, Iterable): #if iterable with strings containing strings
         for i in range(len(z)):
             s = ""
@@ -384,4 +384,4 @@ def untransform(z, charset):
                 oh = np.argmax(z[i][j])
                 s += charset[oh]
             z1.append(s.strip())
-        return z1 
+        return z1
