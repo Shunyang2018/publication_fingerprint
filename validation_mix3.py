@@ -30,12 +30,14 @@ from function import smi2infomax
 
 
 
-smi = '../alphafold/validation/smi_val.txt'
-df = smi2infomax(smi)
+# smi = '../alphafold/validation/smi_val.txt'
+# df = smi2infomax(smi)
 
-df.to_csv('../alphafold/validation/infomax_val.csv')
+# df.to_csv('../alphafold/validation/infomax_val.csv')
 
-#%% deepec
+df = pd.read_csv('../alphafold/validation/infomax_val.csv').iloc[:,1:]
+
+#%% deepec generate 
 
 
 import pkg_resources
